@@ -49,7 +49,9 @@ namespace SamsungAutoWinner
                         driver.FindElementByXPath("//button[text()='Play Now']").Click();
                         Thread.Sleep(1000);
                         driver.FindElementByXPath("//button[text()='Confirm']").Click();
-                        Thread.Sleep(12000);
+                        Thread.Sleep(15000);
+                        while (driver.FindElementsByXPath("//button[text()='Done']").Count == 0)
+                            Thread.Sleep(1000);
                         if (driver.FindElementsByXPath("//h3[text()='Sorry!']").Count == 0)
                             Console.WriteLine($"!!! You won {++won} times !!!");
                         driver.FindElementByXPath("//button[text()='Done']").Click();
@@ -58,15 +60,8 @@ namespace SamsungAutoWinner
                     }
                     catch
                     {
-                        try
-                        {
-                            driver.Url = "https://www.samsungrewards.com/rewards/#/catalog/chance_to_win";
-                            Thread.Sleep(5000);
-                        }
-                        catch
-                        {
-                            break;
-                        }
+                        driver.Url = "https://www.samsungrewards.com/rewards/#/catalog/chance_to_win";
+                        Thread.Sleep(5000);
                     }
                 }
 
