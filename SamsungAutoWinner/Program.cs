@@ -9,6 +9,8 @@ namespace SamsungAutoWinner
 {
     class Program
     {
+        static void Wait(int sec) => Thread.Sleep(TimeSpan.FromSeconds(sec));
+
         static void Main(string[] args)
         {
             var opts = new ChromeOptions();
@@ -17,13 +19,13 @@ namespace SamsungAutoWinner
             using (var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), opts))
             {
                 driver.Manage().Window.Maximize();
-                driver.Url = "https://www.samsungrewards.com/rewards/#/main";
+                driver.Navigate().GoToUrl("https://www.samsungrewards.com/rewards/#/main");
 
                 Console.WriteLine("Login to Samsung and press any key");
                 Console.ReadKey(true);
                 Console.WriteLine("Press q to win points, w to win galaxy watch");
 
-                string reward = null;
+                string reward;
                 switch (Console.ReadKey(true).Key)
                 {
                     case ConsoleKey.Q:
@@ -36,34 +38,42 @@ namespace SamsungAutoWinner
                         return;
                 }
 
-                int played = 0, won = 0;
+                int played = 0, won = 0, points = 0;
 
-                while (played < 1000)
+                do
                 {
                     try
                     {
                         driver.FindElementByXPath(reward).Click();
-                        Thread.Sleep(1000);
+                        Wait(1);
+
                         new Actions(driver).MoveToElement(driver.FindElementByXPath("//label[@for='catalog_terms']"), 5, 5).Click().Perform();
-                        Thread.Sleep(1000);
+                        Wait(1);
+
                         driver.FindElementByXPath("//button[text()='Play Now']").Click();
-                        Thread.Sleep(1000);
+                        Wait(1);
+
                         driver.FindElementByXPath("//button[text()='Confirm']").Click();
-                        Thread.Sleep(15000);
-                        while (driver.FindElementsByXPath("//button[text()='Done']").Count == 0)
-                            Thread.Sleep(1000);
+                        Wait(12);
+
                         if (driver.FindElementsByXPath("//h3[text()='Sorry!']").Count == 0)
                             Console.WriteLine($"!!! You won {++won} times !!!");
+
                         driver.FindElementByXPath("//button[text()='Done']").Click();
-                        Thread.Sleep(1000);
-                        Console.WriteLine($"You played {++played} times");
+                        Wait(1);
+
+                        points = int.Parse(driver.FindElementByXPath(
+                            "//div[@class='mid_content_container']/div/h3[2]/span[1]").Text.Replace(",", ""));
+                        Console.WriteLine($"You played {++played} times, points {points}");
                     }
                     catch
                     {
-                        driver.Url = "https://www.samsungrewards.com/rewards/#/catalog/chance_to_win";
-                        Thread.Sleep(5000);
+                        driver.Navigate().GoToUrl("https://www.samsungrewards.com/rewards/#/catalog/chance_to_win");
+                        driver.Navigate().Refresh();
+                        Wait(5);
                     }
                 }
+                while (points > 4000);
 
                 Console.WriteLine("Stopped. Press any key");
                 Console.ReadKey(true);
