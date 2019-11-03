@@ -69,11 +69,10 @@ namespace SamsungAutoWinner
                     catch
                     {
                         driver.Navigate().GoToUrl("https://www.samsungrewards.com/rewards/#/catalog/chance_to_win");
-                        driver.Navigate().Refresh();
-                        Wait(5);
+                        Wait(1);
                     }
                 }
-                while (points > 4000);
+                while (points > 0);
 
                 Console.WriteLine("Stopped. Press any key");
                 Console.ReadKey(true);
